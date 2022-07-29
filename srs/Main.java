@@ -89,10 +89,7 @@ public class Main {
             if (isSelected[i]) {
                 if (Arrays.asList(productsDiscount).contains(products[i])) {
                     int countDisc = productCountList[i] / 3;
-                    System.out.println(sumProducts);
                     sumProducts -= prices[i] * countDisc;
-                    System.out.println(countDisc);
-                    System.out.println(sumProducts);
                 }
             }
         }

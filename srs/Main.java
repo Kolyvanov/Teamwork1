@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -7,11 +8,12 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] products = {"Черешня", "Яблоки", "Персики"};
-        int[] prices = {350, 99, 170};
-        int[] productCountList = new int[products.length];
-        boolean[] isSelected = new boolean[products.length];
-        int sumProducts = 0;
+        String[] products = {"Черешня", "Яблоки", "Персики"}; // список доступных товаров
+        String[] productsDiscount = {"Черешня", "Персики"}; // акционный товар
+        int[] prices = {350, 99, 170}; // цена товара
+        int[] productCountList = new int[products.length]; //количество товара в корзине
+        boolean[] isSelected = new boolean[products.length]; // для поиска выбранного товара
+        int sumProducts = 0; // сумма в корзине
         while (true) {
             int numberOfProduct;
             int productCount;
@@ -22,6 +24,7 @@ public class Main {
             }
             String input = scanner.nextLine();
             if ("end".equals(input)) {
+                sumProducts = getShareAmount(products, productsDiscount, prices, productCountList, isSelected, sumProducts);
                 break;
             }
             try {
@@ -45,12 +48,52 @@ public class Main {
             isSelected[numberOfProduct - 1] = true;
         }
         System.out.println("Ваша корзина:");
+        shoppingListDisplay(products, productsDiscount, prices, productCountList, isSelected);
+        System.out.printf("Итого %d руб\n", sumProducts);
+    }
+
+    /**
+     * Метод выводит на экран содержимое корзины покупателя с учетом акционного товара
+     * @param products список доступных товаров
+     * @param productsDiscount список акционного товара
+     * @param prices список цен на товар
+     * @param productCountList количество приобретенных товаров
+     * @param isSelected список приобретенных товаров
+     */
+    private static void shoppingListDisplay(String[] products, String[] productsDiscount, int[] prices, int[] productCountList, boolean[] isSelected) {
         for (int i = 0; i < products.length; i++) {
             if (isSelected[i]) {
-                System.out.printf("%s %d шт %d руб/шт %d руб в сумме\n", products[i], productCountList[i], prices[i], prices[i] * productCountList[i]);
+                if (Arrays.asList(productsDiscount).contains(products[i])) {
+                    System.out.printf("%s %d шт %d руб/шт %d руб в сумме с учетов товара по акции 3 по цене 2\n", products[i],
+                            productCountList[i], prices[i], prices[i] * (productCountList[i] - productCountList[i] / 3));
+                } else {
+                    System.out.printf("%s %d шт %d руб/шт %d руб в сумме\n", products[i],
+                            productCountList[i], prices[i], prices[i] * productCountList[i]);
+                }
             }
         }
-        System.out.printf("Итого %d руб\n", sumProducts);
+    }
+
+    /**
+     * Метод обработки акционного товара (3 по цене 2)
+     * @param products список доступных товаров
+     * @param productsDiscount список акционного товара
+     * @param prices список цен на товар
+     * @param productCountList количество приобретенных товаров
+     * @param isSelected список приобретенных товаров
+     * @param sumProducts сумма товара
+     * @return сумма товара с учетом акции
+     */
+    private static int getShareAmount(String[] products, String[] productsDiscount, int[] prices, int[] productCountList, boolean[] isSelected, int sumProducts) {
+        for (int i = 0; i < products.length; i++) {
+            if (isSelected[i]) {
+                if (Arrays.asList(productsDiscount).contains(products[i])) {
+                    int countDisc = productCountList[i] / 3;
+                    sumProducts -= prices[i] * countDisc;
+                }
+            }
+        }
+        return sumProducts;
     }
 
     private static boolean inputValidation(String[] products, int numberOfProduct, int productCount) {

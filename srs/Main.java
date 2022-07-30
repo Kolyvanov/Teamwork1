@@ -36,16 +36,25 @@ public class Main {
                 }
                 numberOfProduct = Integer.parseInt(options[0]);
                 productCount = Integer.parseInt(options[1]);
-                if (inputValidation(products, numberOfProduct, productCount)) {
+                if (inputValidation(products, numberOfProduct)) {
                     continue;
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Не корректный ввод, необходимо вводить только цифры!");
                 continue;
             }
-            productCountList[numberOfProduct - 1] += productCount;
-            sumProducts += prices[numberOfProduct - 1] * productCount;
-            isSelected[numberOfProduct - 1] = true;
+            if (productCount == 0) {
+                sumProducts -= prices[numberOfProduct - 1] * productCountList[numberOfProduct - 1];
+                productCountList[numberOfProduct - 1] = 0;
+            }
+            if ((productCountList[numberOfProduct - 1] + productCount) < 0) {
+                sumProducts -= prices[numberOfProduct - 1] * productCountList[numberOfProduct - 1];
+                productCountList[numberOfProduct - 1] = 0;
+            } else {
+                productCountList[numberOfProduct - 1] += productCount;
+                sumProducts += prices[numberOfProduct - 1] * productCount;
+            }
+            isSelected[numberOfProduct - 1] = productCountList[numberOfProduct - 1] > 0;
         }
         System.out.println("Ваша корзина:");
         shoppingListDisplay(products, productsDiscount, prices, productCountList, isSelected);
@@ -54,11 +63,12 @@ public class Main {
 
     /**
      * Метод выводит на экран содержимое корзины покупателя с учетом акционного товара
-     * @param products список доступных товаров
+     *
+     * @param products         список доступных товаров
      * @param productsDiscount список акционного товара
-     * @param prices список цен на товар
+     * @param prices           список цен на товар
      * @param productCountList количество приобретенных товаров
-     * @param isSelected список приобретенных товаров
+     * @param isSelected       список приобретенных товаров
      */
     private static void shoppingListDisplay(String[] products, String[] productsDiscount, int[] prices, int[] productCountList, boolean[] isSelected) {
         for (int i = 0; i < products.length; i++) {
@@ -76,12 +86,13 @@ public class Main {
 
     /**
      * Метод обработки акционного товара (3 по цене 2)
-     * @param products список доступных товаров
+     *
+     * @param products         список доступных товаров
      * @param productsDiscount список акционного товара
-     * @param prices список цен на товар
+     * @param prices           список цен на товар
      * @param productCountList количество приобретенных товаров
-     * @param isSelected список приобретенных товаров
-     * @param sumProducts сумма товара
+     * @param isSelected       список приобретенных товаров
+     * @param sumProducts      сумма товара
      * @return сумма товара с учетом акции
      */
     private static int getShareAmount(String[] products, String[] productsDiscount, int[] prices, int[] productCountList, boolean[] isSelected, int sumProducts) {
@@ -96,13 +107,9 @@ public class Main {
         return sumProducts;
     }
 
-    private static boolean inputValidation(String[] products, int numberOfProduct, int productCount) {
+    private static boolean inputValidation(String[] products, int numberOfProduct) {
         if (numberOfProduct == 0 || numberOfProduct > products.length) {
             System.out.println("Не верный выбор продукта, необходимо выбрать корректный продукт из списка");
-            return true;
-        }
-        if (productCount <= 0) {
-            System.out.println("Введено не корректное количество продуктов!");
             return true;
         }
         return false;

@@ -33,16 +33,25 @@ public class Main {
                 }
                 numberOfProduct = Integer.parseInt(options[0]);
                 productCount = Integer.parseInt(options[1]);
-                if (inputValidation(products, numberOfProduct, productCount)) {
+                if (inputValidation(products, numberOfProduct)) {
                     continue;
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Не корректный ввод, необходимо вводить только цифры!");
                 continue;
             }
-            productCountList[numberOfProduct - 1] += productCount;
-            sumProducts += prices[numberOfProduct - 1] * productCount;
-            isSelected[numberOfProduct - 1] = true;
+            if (productCount == 0) {
+                sumProducts -= prices[numberOfProduct - 1] * productCountList[numberOfProduct - 1];
+                productCountList[numberOfProduct - 1] = 0;
+            }
+            if ((productCountList[numberOfProduct - 1] + productCount) < 0) {
+                sumProducts -= prices[numberOfProduct - 1] * productCountList[numberOfProduct - 1];
+                productCountList[numberOfProduct - 1] = 0;
+            } else {
+                productCountList[numberOfProduct - 1] += productCount;
+                sumProducts += prices[numberOfProduct - 1] * productCount;
+            }
+            isSelected[numberOfProduct - 1] = productCountList[numberOfProduct - 1] > 0;
         }
         System.out.println("Ваша корзина:");
         for (int i = 0; i < products.length; i++) {
@@ -53,13 +62,9 @@ public class Main {
         System.out.printf("Итого %d руб\n", sumProducts);
     }
 
-    private static boolean inputValidation(String[] products, int numberOfProduct, int productCount) {
+    private static boolean inputValidation(String[] products, int numberOfProduct) {
         if (numberOfProduct == 0 || numberOfProduct > products.length) {
             System.out.println("Не верный выбор продукта, необходимо выбрать корректный продукт из списка");
-            return true;
-        }
-        if (productCount <= 0) {
-            System.out.println("Введено не корректное количество продуктов!");
             return true;
         }
         return false;
